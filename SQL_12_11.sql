@@ -361,19 +361,18 @@ BEGIN
 END;
 /
 
+-- length를 이용해서 길이로..!!
 DECLARE
-    v_count number(2,0) := 1;
-    v_star varchar2(10);
+    v_star varchar2(12) := '*';
 BEGIN
-    WHILE v_count <= 5 Loop
-    v_count := v_count + 1;
-    v_star := v_star || '*';
+    WHILE length(v_star) <= 5 Loop
     DBMS_OUTPUT.PUT_LINE(v_star);
+    v_star := v_star || '*';
     end loop;
-    
 END;
 /
-  
+
+-- for in 사이에 있는 변수는 readonly~
 DECLARE
     v_sum VARCHAR2(10);
 BEGIN
@@ -385,18 +384,12 @@ END;
 /
 
 -- 2중 loop?
-DECLARE
-    v_count NUMBER := 1;
 BEGIN
-    loop 
-    
-        loop DBMS_OUTPUT.PUT_line('*');
-                v_count := v_count + 1;
-                exit when v_count > 1;
-        end loop;
-    DBMS_OUTPUT.PUT('*');
-    v_count := v_count + 1;
-    exit when v_count > 3;
-    END loop;
+    FOR line IN 1..5 loop -- 줄 제어
+        for star in 1..line loop -- 줄 만큼 * 찍음
+            DBMS_OUTPUT.PUT('*');
+        END loop;
+            DBMS_OUTPUT.PUT_LINE('');
+        END loop;
 END;
 /
