@@ -393,3 +393,21 @@ BEGIN
         END loop;
 END;
 /
+
+DECLARE
+    v_line number(1,0) := 1;
+    v_star NUMBER(1,0) := 1;
+BEGIN
+    LOOP
+        v_star := 1;
+        LOOP
+            DBMS_OUTPUT.put('*');
+            v_star := v_star + 1;
+            EXIT WHEN v_star > v_line;
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('');
+        v_line := v_line + 1;
+        EXIT WHEN v_line > 5;
+    END LOOP;
+END;
+/
