@@ -34,7 +34,10 @@
           </tr>
           <tr>
             <td colspan="6" class="text-center">
-              <button class="btn btn-xs btn-info" @click="goToUpdateForm">
+              <button
+                class="btn btn-xs btn-info"
+                @click="goToUpdateForm(boardInfo.no)"
+              >
                 수정
               </button>
             </td>
