@@ -371,8 +371,8 @@ BEGIN
         EXIT WHEN emp_cursor%NOTFOUND;
         
         DBMS_OUTPUT.PUT('사원 이름 : ' || emp_rec.employee_id);
-        DBMS_OUTPUT.PUT('   월급 : $' || emp_rec.salary);
-        DBMS_OUTPUT.PUT_LINE('  연봉 : $'|| emp_rec.annual);
+        DBMS_OUTPUT.PUT('   월급 : ' || emp_rec.salary);
+        DBMS_OUTPUT.PUT_LINE('  연봉 : '|| emp_rec.annual);
    
     END LOOP;
     
@@ -381,4 +381,5 @@ BEGIN
 END;
 /
 
+-- %ROWTYPE은 테이블, 뷰, 커서만 참조 가능하고 나머지는 %TYPE이다.
 
