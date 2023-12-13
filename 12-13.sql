@@ -1,6 +1,9 @@
 set serveroutput on;
 show serveroutput;
 
+
+
+
 -- 키워드
 /*
 커서 for 루프 : 커서(open, fetch, close)를 일괄적으로 묶어서 한번에 빢!
@@ -36,7 +39,7 @@ DECLARE
     CURSOR emp_cursor IS
         SELECT employee_id, last_name, job_id
         FROM employees
-        WHERE department_id = &사원번호;
+        WHERE department_id = &부서번호;
 BEGIN
     FOR emp_rec IN emp_cursor LOOP
         DBMS_OUTPUT.put(emp_cursor%ROWCOUNT);
@@ -116,7 +119,6 @@ BEGIN
    
     FETCH emp_cursor INTO emp_info;
         DBMS_OUTPUT.PUT_LINE(emp_info.last_name);
-    OPEN emp_cursor(50);
     CLOSE emp_cursor;
 END;
 /
@@ -500,6 +502,7 @@ IS
         where employee_id = v_id;
 
     v_name test_employee.last_name%TYPE;
+    v_out VARCHAR2(100);
     
 BEGIN
     OPEN emp_cur;
@@ -507,11 +510,14 @@ BEGIN
     FETCH emp_cur INTO v_name;
     
     CLOSE emp_cur;
+        DBMS_OUTPUT.PUT_LINE(length(v_name));
+
+    v_name :=  SUBSTR(v_name,1,1) || RPAD('*',length(v_name)-1,'*');
     
     
     DBMS_OUTPUT.PUT_LINE(v_name);
+    DBMS_OUTPUT.PUT_LINE(length(v_name));
     
-    v_name := replace();
     
     
 END;
@@ -526,9 +532,35 @@ EXECUTE yedam_emp(177);
 만약 입력한 사원이 없는 경우에는 ‘No search employee!!’라는 메시지를 출력하세요.(예외처리)
 실행) EXECUTE y_update(200, 10)
 */
+CREATE or replace PROCEDURE y_update
+(v_empid in NUMBER,
+ v_sal in number)
+is
+ e_no_emp EXCEPTION;
+ v_salchange NUMBER;
+begin
+    v_salchange := v_sal/100;
+    update employees set salary = salary + v_salchange
+    where employee_id = v_empid;
+    
+    
+    if SQL%ROWCOUNT = 0 THEN
+        Raise e_no_emp;
+    end if;
+    DBMS_OUTPUT.PUT_LINE('성공!');
+EXCEPTION
+    WHEN e_no_emp THEN
+        DBMS_OUTPUT.PUT_LINE('No search employee');
+
+end;
+/
+
+EXECUTE y_update(1140, 10);
+
 /*
 5.
 다음과 같이 테이블을 생성하시오.
+*/
 create table yedam01
 (y_id number(10),
  y_name varchar2(20));
@@ -536,6 +568,7 @@ create table yedam01
 create table yedam02
 (y_id number(10),
  y_name varchar2(20));
+/*`1
 5-1.
 부서번호를 입력하면 사원들 중에서 입사년도가 2005년 이전 입사한 사원은 yedam01 테이블에 입력하고,
 입사년도가 2005년(포함) 이후 입사한 사원은 yedam02 테이블에 입력하는 y_proc 프로시저를 생성하시오.
@@ -544,4 +577,59 @@ create table yedam02
 1. 단, 부서번호가 없을 경우 "해당부서가 없습니다" 예외처리
 2. 단, 해당하는 부서에 사원이 없을 경우 "해당부서에 사원이 없습니다" 예외처리
 */
+select employee_id from employees where department_id = 120;
+select * from departments;
+execute y_proc(120);
+
+select * from yedam01;
+select * from yedam02;
+
+create or replace procedure y_proc
+(v_deptid number)
+is
+ cursor emp_cursor IS
+    select * from employees
+    where department_id = v_deptid;
+    
+ cursor dep_cursor is
+    select * from departments
+    where department_id = v_deptid;
+    
+ emp_rec emp_cursor%ROWTYPE;
+ dep_rec dep_cursor%ROWTYPE;
+ 
+ e_no_emp EXCEPTION;
+ e_no_dept EXCEPTION;
+begin
+
+    open dep_cursor;
+    fetch dep_cursor into dep_rec;
+        if dep_cursor%NOTFOUND THEN
+            RAISE e_no_dept;
+        end if;
+    close dep_cursor;
+
+    open emp_cursor;
+    loop
+    fetch emp_cursor into emp_rec;
+    EXIT WHEN emp_cursor%NOTFOUND;
+        if emp_rec.hire_date >= to_date('2005-01-01') THEN
+            insert into yedam02 values(emp_rec.employee_id, emp_rec.last_name);
+        else
+            insert into yedam01 values(emp_rec.employee_id, emp_rec.last_name);
+        end if;
+    end loop;
+        if emp_cursor%ROWCOUNT = 0 then
+            RAISE e_no_emp;
+        end if;
+    CLOSE emp_cursor;
+    
+EXCEPTION
+    WHEN e_no_dept THEN
+        DBMS_OUTPUT.PUT_LINE('해당부서가 없습니다');
+    when e_no_emp THEN
+        DBMS_OUTPUT.PUT_LINE('해당 부서에 사원이 없습니다.');
+end;
+/
+
 
