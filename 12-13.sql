@@ -514,17 +514,13 @@ BEGIN
 
     v_name :=  SUBSTR(v_name,1,1) || RPAD('*',length(v_name)-1,'*');
     
-    
     DBMS_OUTPUT.PUT_LINE(v_name);
     DBMS_OUTPUT.PUT_LINE(length(v_name));
-    
-    
-    
 END;
 /
 
-EXECUTE yedam_emp(177);
-
+EXECUTE yedam_emp(178);
+SELECT last_name from employees where employee_id = 100;
 
 /*
 4.
@@ -540,6 +536,7 @@ is
  v_salchange NUMBER;
 begin
     v_salchange := v_sal/100;
+    
     update employees set salary = salary + v_salchange
     where employee_id = v_empid;
     
@@ -555,7 +552,7 @@ EXCEPTION
 end;
 /
 
-EXECUTE y_update(1140, 10);
+EXECUTE y_update(110, 10);
 
 /*
 5.
@@ -577,9 +574,9 @@ create table yedam02
 1. 단, 부서번호가 없을 경우 "해당부서가 없습니다" 예외처리
 2. 단, 해당하는 부서에 사원이 없을 경우 "해당부서에 사원이 없습니다" 예외처리
 */
-select employee_id from employees where department_id = 120;
+select * from employees where department_id = 100;
 select * from departments;
-execute y_proc(120);
+execute y_proc(80);
 
 select * from yedam01;
 select * from yedam02;
@@ -601,7 +598,6 @@ is
  e_no_emp EXCEPTION;
  e_no_dept EXCEPTION;
 begin
-
     open dep_cursor;
     fetch dep_cursor into dep_rec;
         if dep_cursor%NOTFOUND THEN
@@ -613,7 +609,8 @@ begin
     loop
     fetch emp_cursor into emp_rec;
     EXIT WHEN emp_cursor%NOTFOUND;
-        if emp_rec.hire_date >= to_date('2005-01-01') THEN
+        if emp_rec.hire_date >= to_date('2005-01-01','yyyy-MM-dd') THEN
+    --  if TO_CHAR(emp_rec_hire_date, 'yyyy') < '2005' THEN
             insert into yedam02 values(emp_rec.employee_id, emp_rec.last_name);
         else
             insert into yedam01 values(emp_rec.employee_id, emp_rec.last_name);
@@ -631,5 +628,6 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('해당 부서에 사원이 없습니다.');
 end;
 /
+
 
 
